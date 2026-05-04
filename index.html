@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Noël DAGNISSE | Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <style>
+    :root {
+      --bg: #060b18;
+      --accent: #3b82f6;
+      --accent2: #60efff;
+      --accent3: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --nav-w: 68px;
+      --nav-w-open: 210px;
+      --ease: cubic-bezier(0.4,0,0.2,1);
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; overflow-x: hidden; }
+
+    /* ORBS */
+    .orbs { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .orb  { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .1; animation: drift 20s ease-in-out infinite alternate; }
+    .o1 { width:500px; height:500px; background:var(--accent);  top:-80px;  left:8%;  animation-delay:0s; }
+    .o2 { width:400px; height:400px; background:var(--accent3); bottom:5%;  right:4%; animation-delay:-7s; }
+    .o3 { width:300px; height:300px; background:var(--accent2); top:45%;    left:45%; animation-delay:-14s; }
+    @keyframes drift { to { transform: translateY(50px) scale(1.1); } }
+
+    /* SIDENAV */
+    .sidenav {
+      position: fixed; left:0; top:0; height:100vh;
+      width: var(--nav-w);
+      background: rgba(6,11,24,.88);
+      backdrop-filter: blur(24px);
+      border-right: 1px solid rgba(255,255,255,.06);
+      display: flex; flex-direction: column;
+      padding: 24px 0; z-index: 200;
+      transition: width .45s var(--ease);
+      overflow: hidden;
+    }
+    .sidenav:hover { width: var(--nav-w-open); }
+
+    .nav-logo {
+      display: flex; align-items: center; gap:14px;
+      padding: 0 16px 24px; white-space: nowrap;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      margin-bottom: 16px;
+    }
+    .logo-mark {
+      min-width:36px; width:36px; height:36px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius:10px; display:flex; align-items:center; justify-content:center;
+      font-family:'Space Mono',monospace; font-size:12px; font-weight:700; color:#060b18;
+    }
+    .logo-text { font-size:14px; font-weight:800; white-space:nowrap; opacity:0; transform:translateX(-8px); transition: opacity .3s .1s, transform .3s .1s; }
+    .sidenav:hover .logo-text { opacity:1; transform:translateX(0); }
+
+    .nav-items { list-style:none; width:100%; flex:1; display:flex; flex-direction:column; gap:2px; padding:0 8px; }
+    .nav-item a {
+      display:flex; align-items:center; gap:14px; padding:12px 10px; border-radius:12px;
+      text-decoration:none; color:var(--muted); white-space:nowrap;
+      transition: background .25s, color .25s; position: relative;
+    }
+    .nav-item a:hover, .nav-item a.active { background:rgba(59,130,246,.1); color:var(--text); }
+    .nav-item a.active { color:var(--accent2); }
+    .nav-item a.active::before { content:''; position:absolute; left:-8px; top:50%; transform:translateY(-50%); width:3px; height:55%; background:linear-gradient(to bottom,var(--accent),var(--accent2)); border-radius:0 3px 3px 0; }
+    .nav-icon { min-width:22px; width:22px; height:22px; display:flex; align-items:center; justify-content:center; transition:transform .3s; }
+    .nav-item a:hover .nav-icon { transform:scale(1.15); }
+    .nav-icon svg { width:20px; height:20px; stroke-width:1.8; }
+    .nav-label { font-size:13px; font-weight:600; opacity:0; transform:translateX(-10px); transition: opacity .3s .08s, transform .3s .08s; }
+    .sidenav:hover .nav-label { opacity:1; transform:translateX(0); }
+
+    .nav-bottom { width:100%; padding:16px 8px 0; border-top:1px solid rgba(255,255,255,.06); }
+    .nav-bottom a { display:flex; align-items:center; gap:14px; padding:12px 10px; border-radius:12px; text-decoration:none; color:var(--muted); white-space:nowrap; transition: background .25s, color .25s; }
+    .nav-bottom a:hover { background:rgba(255,255,255,.05); color:var(--text); }
+
+    /* MAIN */
+    main { margin-left:var(--nav-w); position:relative; z-index:1; }
+    .section { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:80px 70px 80px 80px; position:relative; }
+
+    /* REVEAL */
+    .reveal { opacity:0; transform:translateY(50px); transition: opacity .9s var(--ease), transform .9s var(--ease); }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+
+    /* HELLO */
+    #hello { flex-direction:column; text-align:center; }
+    .hello-inner { max-width:720px; }
+    .hello-tag { display:inline-block; font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--accent2); background:rgba(96,239,255,.07); border:1px solid rgba(96,239,255,.2); padding:6px 18px; border-radius:100px; margin-bottom:32px; animation: fadeUp .8s .2s both; }
+    .hello-name { font-size: clamp(44px,8vw,86px); font-weight:800; line-height:1.0; letter-spacing:-.04em; animation: fadeUp .9s .4s both; }
+    .grad { background: linear-gradient(90deg, var(--accent), var(--accent2) 55%, var(--accent3)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+
+    .hello-roles { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:22px; animation: fadeUp .9s .6s both; }
+    .role-pill { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.09); padding:7px 16px; border-radius:100px; font-size:13px; font-weight:600; color:var(--text); }
+    .role-pill svg { width:15px; height:15px; stroke:var(--accent2); stroke-width:2; fill:none; flex-shrink:0; }
+
+    .hello-desc { margin:26px auto 0; font-size:15px; color:var(--muted); line-height:1.8; max-width:520px; animation: fadeUp .9s .8s both; }
+
+    .hello-cta { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top:42px; animation: fadeUp .9s 1s both; }
+
+    .btn-primary { padding:13px 30px; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#060b18; font-weight:700; font-size:14px; border-radius:12px; text-decoration:none; font-family:'Syne',sans-serif; transition: transform .2s, box-shadow .2s; }
+    .btn-primary:hover { transform:translateY(-3px); box-shadow:0 12px 30px rgba(59,130,246,.35); }
+
+    .btn-outline { padding:13px 30px; border:1px solid rgba(255,255,255,.15); color:var(--text); font-weight:600; font-size:14px; border-radius:12px; text-decoration:none; font-family:'Syne',sans-serif; transition: background .2s, transform .2s; }
+    .btn-outline:hover { background:rgba(255,255,255,.06); transform:translateY(-3px); }
+
+    .btn-cv { display:inline-flex; align-items:center; gap:8px; padding:13px 28px; border:1px solid rgba(96,239,255,.25); color:var(--accent2); font-weight:600; font-size:14px; border-radius:12px; text-decoration:none; font-family:'Syne',sans-serif; transition: background .25s, transform .25s, box-shadow .25s; }
+    .btn-cv svg { width:16px; height:16px; stroke:var(--accent2); stroke-width:2; fill:none; }
+    .btn-cv:hover { background:rgba(96,239,255,.08); transform:translateY(-3px); box-shadow:0 8px 24px rgba(96,239,255,.15); }
+
+    .scroll-hint { position:absolute; bottom:36px; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:6px; animation: fadeUp 1s 1.4s both; }
+    .scroll-hint span { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.15em; color:var(--muted); text-transform:uppercase; }
+    .scroll-line { width:1px; height:40px; background:linear-gradient(to bottom,var(--muted),transparent); animation:scrollPulse 2s ease-in-out infinite; }
+    @keyframes scrollPulse { 0%,100%{opacity:.3} 50%{opacity:1} }
+
+    /* ABOUT */
+    #about { background:rgba(13,21,37,.4); }
+    .about-inner { max-width:900px; width:100%; display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center; }
+    .section-tag { font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+    .section-tag::before { content:''; width:24px; height:1px; background:var(--accent); }
+    .section-title { font-size:clamp(30px,4vw,46px); font-weight:800; letter-spacing:-.03em; line-height:1.1; margin-bottom:20px; }
+    .about-text { color:var(--muted); line-height:1.8; font-size:15px; }
+    .about-stats { display:flex; flex-direction:column; gap:18px; }
+    .stat-card { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); border-radius:16px; padding:22px 24px; transition: background .3s, transform .3s; }
+    .stat-card:hover { background:rgba(59,130,246,.07); transform:translateX(6px); }
+    .stat-num { font-size:34px; font-weight:800; font-family:'Space Mono',monospace; background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .stat-label { font-size:13px; color:var(--muted); margin-top:4px; }
+
+    /* PROJECTS */
+    #projects { background:transparent; }
+    .projects-inner { max-width:900px; width:100%; }
+    .projects-header { margin-bottom:48px; }
+    .projects-desc { color:var(--muted); font-size:15px; line-height:1.7; max-width:480px; margin-top:12px; }
+    .project-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(360px,1fr)); gap:24px; }
+    .project-card { background:rgba(255,255,255,.025); border:1px solid rgba(255,255,255,.07); border-radius:20px; padding:32px; position:relative; overflow:hidden; transition: transform .4s var(--ease), box-shadow .4s, border-color .4s; }
+    .project-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent),var(--accent2)); transform:scaleX(0); transform-origin:left; transition:transform .4s var(--ease); }
+    .project-card:hover::before { transform:scaleX(1); }
+    .project-card:hover { transform:translateY(-8px); box-shadow:0 24px 50px rgba(0,0,0,.4); border-color:rgba(59,130,246,.2); }
+    .project-icon { width:48px; height:48px; border-radius:14px; background:rgba(59,130,246,.1); display:flex; align-items:center; justify-content:center; margin-bottom:20px; }
+    .project-icon svg { width:24px; height:24px; stroke:var(--accent2); stroke-width:1.8; fill:none; }
+    .project-name { font-size:20px; font-weight:700; letter-spacing:-.02em; margin-bottom:10px; }
+    .project-desc { color:var(--muted); font-size:14px; line-height:1.7; margin-bottom:24px; }
+    .project-tags { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:26px; }
+    .tag { font-size:11px; font-family:'Space Mono',monospace; background:rgba(96,239,255,.07); border:1px solid rgba(96,239,255,.15); color:var(--accent2); padding:4px 10px; border-radius:100px; }
+    .btn-voir { display:inline-flex; align-items:center; gap:8px; padding:12px 22px; background:rgba(59,130,246,.1); border:1px solid rgba(59,130,246,.3); color:var(--accent2); font-weight:700; font-size:13px; border-radius:10px; text-decoration:none; font-family:'Syne',sans-serif; transition: background .25s, transform .25s, box-shadow .25s; }
+    .btn-voir svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2.5; transition:transform .25s; }
+    .btn-voir:hover { background:rgba(59,130,246,.2); transform:translateX(4px); box-shadow:0 0 20px rgba(59,130,246,.2); }
+    .btn-voir:hover svg { transform:translateX(4px); }
+
+    /* CONTACT */
+    #contact { background:rgba(13,21,37,.5); }
+    .contact-inner { max-width:920px; width:100%; display:grid; grid-template-columns:1fr 1.4fr; gap:80px; align-items:start; }
+    .contact-subtitle { color:var(--muted); font-size:15px; line-height:1.8; margin-top:14px; margin-bottom:36px; }
+    .social-links { display:flex; flex-direction:column; gap:12px; }
+    .social-link { display:flex; align-items:center; gap:14px; padding:14px 18px; border-radius:14px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); text-decoration:none; color:var(--text); font-size:14px; font-weight:600; transition: background .25s, transform .25s, border-color .25s; }
+    .social-link:hover { transform:translateX(6px); }
+    .social-link svg { width:20px; height:20px; flex-shrink:0; }
+    .s-name { font-size:12px; color:var(--muted); font-weight:400; margin-top:1px; }
+    .social-link.linkedin:hover { border-color:rgba(10,102,194,.5); background:rgba(10,102,194,.1); }
+    .social-link.github:hover   { border-color:rgba(240,246,252,.2); background:rgba(255,255,255,.05); }
+    .social-link.facebook:hover { border-color:rgba(24,119,242,.5); background:rgba(24,119,242,.1); }
+    .social-link.whatsapp:hover { border-color:rgba(37,211,102,.5); background:rgba(37,211,102,.08); }
+
+    /* FORM */
+    .contact-form { background:rgba(255,255,255,.025); border:1px solid rgba(255,255,255,.07); border-radius:24px; padding:36px; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .form-group { position:relative; margin-bottom:24px; }
+    .form-group input, .form-group textarea { width:100%; padding:20px 16px 8px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius:12px; color:var(--text); font-family:'Syne',sans-serif; font-size:14px; outline:none; resize:none; transition: border-color .3s, background .3s, box-shadow .3s; }
+    .form-group textarea { min-height:120px; padding-top:26px; }
+    .form-group input:focus, .form-group textarea:focus { border-color:var(--accent); background:rgba(59,130,246,.05); box-shadow:0 0 0 3px rgba(59,130,246,.1); }
+    .form-group label { position:absolute; left:16px; top:15px; font-size:14px; color:var(--muted); pointer-events:none; transition: top .3s, font-size .3s, color .3s; }
+    .form-group input:focus + label, .form-group input:not(:placeholder-shown) + label, .form-group textarea:focus + label, .form-group textarea:not(:placeholder-shown) + label { top:6px; font-size:10px; color:var(--accent2); letter-spacing:.06em; text-transform:uppercase; }
+    .form-group input::placeholder, .form-group textarea::placeholder { color:transparent; }
+    .form-group::after { content:''; position:absolute; bottom:1px; left:16px; right:16px; height:2px; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:2px; transform:scaleX(0); transition:transform .3s var(--ease); }
+    .form-group:focus-within::after { transform:scaleX(1); }
+
+    .btn-send { width:100%; padding:16px; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#060b18; font-weight:800; font-size:15px; border:none; border-radius:12px; cursor:pointer; font-family:'Syne',sans-serif; letter-spacing:.04em; display:flex; align-items:center; justify-content:center; gap:10px; transition: transform .25s, box-shadow .25s; }
+    .btn-send:hover { transform:translateY(-3px); box-shadow:0 14px 36px rgba(59,130,246,.4); }
+    .btn-send:disabled { opacity:.6; cursor:not-allowed; transform:none; box-shadow:none; }
+    .btn-send svg { width:18px; height:18px; }
+
+    /* FOOTER */
+    footer { margin-left:var(--nav-w); text-align:center; padding:28px; color:var(--muted); font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.1em; border-top:1px solid rgba(255,255,255,.05); position:relative; z-index:1; }
+
+    /* TOAST */
+    #toast { position:fixed; bottom:36px; left:50%; transform:translateX(-50%) translateY(20px); padding:13px 28px; border-radius:100px; border:1px solid; font-size:14px; font-weight:600; opacity:0; transition: opacity .4s, transform .4s; z-index:999; backdrop-filter:blur(12px); white-space:nowrap; }
+    #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes spin   { to { transform:rotate(360deg); } }
+
+    /* MOBILE */
+    @media(max-width:768px){
+      .sidenav { top:auto; bottom:0; width:100%; height:64px; flex-direction:row; align-items:center; padding:0 12px; border-right:none; border-top:1px solid rgba(255,255,255,.06); }
+      .sidenav:hover { width:100%; }
+      .nav-logo, .nav-bottom { display:none; }
+      .nav-items { flex-direction:row; justify-content:space-around; padding:0; gap:0; }
+      .nav-item a { flex-direction:column; gap:4px; padding:8px 10px; border-radius:10px; }
+      .nav-item a.active::before { display:none; }
+      .nav-label { font-size:9px; opacity:1; transform:none; }
+      main, footer { margin-left:0; margin-bottom:64px; }
+      .section { padding:60px 24px; }
+      .about-inner, .contact-inner { grid-template-columns:1fr; gap:40px; }
+      .form-row { grid-template-columns:1fr; }
+      .project-grid { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="toast"></div>
+<div class="orbs"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
+
+<!-- SIDENAV -->
+<nav class="sidenav">
+  <div class="nav-logo">
+    <div class="logo-mark">ND</div>
+    <span class="logo-text">Noël DAGNISSE</span>
+  </div>
+  <ul class="nav-items">
+    <li class="nav-item">
+      <a href="#hello" class="active">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+        <span class="nav-label">Accueil</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a href="#about">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></span>
+        <span class="nav-label">À propos</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a href="#projects">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>
+        <span class="nav-label">Projets</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a href="#contact">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+        <span class="nav-label">Contact</span>
+      </a>
+    </li>
+  </ul>
+  <div class="nav-bottom">
+    <a href="https://github.com/mdagnisse-cyber" target="_blank">
+      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></span>
+      <span class="nav-label">GitHub</span>
+    </a>
+  </div>
+</nav>
+
+<main>
+
+  <!-- HELLO -->
+  <section id="hello" class="section">
+    <div class="hello-inner">
+      <div class="hello-tag">✦ Bienvenue sur mon portfolio</div>
+      <h1 class="hello-name">Bonjour, je suis<br><span class="grad">Noël DAGNISSE</span></h1>
+      <div class="hello-roles">
+        <span class="role-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          Développeur Web
+        </span>
+        <span class="role-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Cybersécurité
+        </span>
+        <span class="role-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Cotonou, Bénin
+        </span>
+      </div>
+      <p class="hello-desc">Étudiant en L2 Informatique à ESGIS, je construis des expériences web modernes, fluides et sécurisées. Passionné par la tech, j'aime transformer des idées en produits concrets.</p>
+      <div class="hello-cta">
+        <a href="#projects" class="btn-primary">Voir mes projets →</a>
+        <a href="#contact" class="btn-outline">Me contacter</a>
+        <a href="monCv.pdf" download="CV_Noel_DAGNISSE.pdf" class="btn-cv">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Télécharger CV
+        </a>
+      </div>
+    </div>
+    <br>
+    <br>
+    <br>
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="section">
+    <div class="about-inner reveal">
+      <div>
+        <div class="section-tag">À propos</div>
+        <h2 class="section-title">Un dev passionné<br>par l'impact</h2>
+        <p class="about-text">Étudiant en Informatique à ESGIS Cotonou, je développe des solutions web alliant performance, sécurité et expérience utilisateur. Mon approche : comprendre le besoin, concevoir avec soin, livrer avec précision.<br><br>Je m'intéresse particulièrement à la cybersécurité et aux architectures web modernes.</p>
+      </div>
+      <div class="about-stats">
+        <div class="stat-card"><div class="stat-num">2+</div><div class="stat-label">Projets livrés et en ligne</div></div>
+        <div class="stat-card"><div class="stat-num">L2</div><div class="stat-label">Informatique — ESGIS Cotonou</div></div>
+        <div class="stat-card"><div class="stat-num">100%</div><div class="stat-label">Passion pour la tech</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects" class="section">
+    <div class="projects-inner reveal">
+      <div class="projects-header">
+        <div class="section-tag">Projets</div>
+        <h2 class="section-title">Ce que j'ai construit</h2>
+        <p class="projects-desc">Des projets réels, accessibles en ligne — conçus pour résoudre des problèmes concrets dans mon environnement.</p>
+      </div>
+      <div class="project-grid">
+
+        <div class="project-card">
+          <div class="project-icon">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <div class="project-name">EpreuveXpress</div>
+          <p class="project-desc">Plateforme web d'épreuves en ligne permettant aux étudiants de s'exercer et de passer des examens de manière digitale. Interface simple, rapide et accessible.</p>
+          <div class="project-tags"><span class="tag">Web App</span><span class="tag">PHP</span><span class="tag">Éducation</span></div>
+          <a href="https://epreuvexpress.wuaze.com" target="_blank" class="btn-voir">
+            Voir le projet <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+
+        <div class="project-card">
+          <div class="project-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg>
+          </div>
+          <div class="project-name">ArtBenin</div>
+          <p class="project-desc">Plateforme de promotion artistique dédiée aux artistes béninois. Un espace numérique pour valoriser la culture et l'art du Bénin auprès d'un public plus large.</p>
+          <div class="project-tags"><span class="tag">Culture</span><span class="tag">Web</span><span class="tag">Bénin</span></div>
+          <a href="https://artbenin.infinityfreeapp.com" target="_blank" class="btn-voir">
+            Voir le projet <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="section">
+    <div class="contact-inner reveal">
+      <div>
+        <div class="section-tag">Contact</div>
+        <h2 class="section-title">Travaillons<br>ensemble</h2>
+        <p class="contact-subtitle">Tu as un projet, une idée, ou juste envie d'échanger ? Je suis disponible et ouvert aux collaborations.</p>
+        <div class="social-links">
+
+          <a href="https://www.linkedin.com/in/no%C3%ABl-dagnisse-44a7a126a" target="_blank" class="social-link linkedin">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="color:#0a66c2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7H10v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+            <div><div>LinkedIn</div><div class="s-name">Noël DAGNISSE</div></div>
+          </a>
+
+          <a href="https://github.com/mdagnisse-cyber" target="_blank" class="social-link github">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            <div><div>GitHub</div><div class="s-name">@mdagnisse-cyber</div></div>
+          </a>
+
+          <a href="https://www.facebook.com/Dagnisse.Noel" target="_blank" class="social-link facebook">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="color:#1877f2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+            <div><div>Facebook</div><div class="s-name">Dagnisse Noël</div></div>
+          </a>
+
+          <a href="https://wa.me/22953944963" target="_blank" class="social-link whatsapp">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="color:#25d366">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/>
+              <path d="M12 0C5.373 0 0 5.373 0 12c0 2.091.536 4.06 1.479 5.779L0 24l6.405-1.452A11.949 11.949 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.882 0-3.64-.487-5.17-1.341l-.371-.22-3.803.862.879-3.7-.242-.381A9.958 9.958 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+            </svg>
+            <div><div>WhatsApp</div><div class="s-name">+229 01 53 94 49 63</div></div>
+          </a>
+
+        </div>
+      </div>
+
+<!-- FORMULAIRE FORMSPREE -->
+<form id="contactForm" class="contact-form">
+
+  <div class="form-row">
+    <div class="form-group">
+      <input type="text" id="nom" placeholder="Nom" required>
+      <label for="nom">Nom</label>
+    </div>
+
+    <div class="form-group">
+      <input type="text" id="prenom" placeholder="Prénom" required>
+      <label for="prenom">Prénom</label>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <input type="email" id="email" placeholder="Email" required>
+    <label for="email">Adresse email</label>
+  </div>
+
+  <div class="form-group">
+    <textarea id="message" placeholder="Message" required></textarea>
+    <label for="message">Votre message</label>
+  </div>
+
+  <button type="submit" class="btn-send" id="sendBtn">
+    Envoyer le message
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <line x1="22" y1="2" x2="11" y2="13"/>
+      <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+    </svg>
+  </button>
+
+</form>
+  </section>
+
+</main>
+
+<footer>© 2026 Noël DAGNISSE · Cotonou, Bénin</footer>
+
+<script>
+  // ── EMAILJS INITIALISATION ──
+  emailjs.init({
+  publicKey: "oZSaSX0L83C7kts"
+});
+  // ── TOAST ──
+  function showToast(msg, ok) {
+    const t = document.getElementById('toast');
+    t.innerText  = msg;
+    t.style.background  = ok ? 'rgba(96,239,255,.1)'  : 'rgba(239,68,68,.12)';
+    t.style.borderColor = ok ? 'rgba(96,239,255,.3)'  : 'rgba(239,68,68,.4)';
+    t.style.color       = ok ? 'var(--accent2)'        : '#f87171';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 4000);
+  }
+
+  // ── REVEAL AU SCROLL ──
+  const revObs = new IntersectionObserver(
+    entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }),
+    { threshold: .15 }
+  );
+  document.querySelectorAll('.reveal').forEach(el => revObs.observe(el));
+
+  // ── NAV ACTIVE ──
+  const navLinks = document.querySelectorAll('.nav-item a');
+  const navObs = new IntersectionObserver(
+    entries => entries.forEach(e => {
+      if(e.isIntersecting){
+        navLinks.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.nav-item a[href="#${e.target.id}"]`);
+        if(a) a.classList.add('active');
+      }
+    }),
+    { threshold: .5 }
+  );
+  document.querySelectorAll('section[id]').forEach(s => navObs.observe(s));
+
+  // ── ENVOI EMAIL VIA EMAILJS ──
+  document.addEventListener("DOMContentLoaded", function () {
+
+  const form = document.getElementById("contactForm");
+  const btn = document.getElementById("sendBtn");
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault(); // 🔥 bloque redirection
+
+    const nom = document.getElementById('nom').value.trim();
+    const prenom = document.getElementById('prenom').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const message = document.getElementById('message').value.trim();
+
+    if (!nom || !prenom || !email || !message) {
+      showToast('⚠️ Veuillez remplir tous les champs', false);
+      return;
+    }
+
+    btn.disabled = true;
+    const oldHTML = btn.innerHTML;
+
+    btn.innerHTML = `
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+           style="animation:spin .8s linear infinite">
+        <path d="M12 2a10 10 0 0 1 10 10"/>
+      </svg>
+      Envoi en cours…`;
+
+    fetch("https://formspree.io/f/mojreepr", {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        nom,
+        prenom,
+        email,
+        message
+      })
+    })
+    .then(res => {
+      if (res.ok) {
+        showToast('✔ Message envoyé ! Je vous répondrai bientôt.', true);
+        form.reset();
+      } else {
+        showToast('❌ Erreur d\'envoi. Réessayez.', false);
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      showToast('❌ Erreur réseau.', false);
+    })
+    .finally(() => {
+      btn.disabled = false;
+      btn.innerHTML = oldHTML; // 🔥 conserve ton design exact
+    });
+
+  });
+
+});
+
+</script>
+<style>@keyframes spin { to { transform:rotate(360deg); } }</style>
+</body>
+</html>
